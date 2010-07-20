@@ -1,0 +1,35 @@
+
+========================================================================
+ - portdbc - CRUX's portdb command line client
+========================================================================
+
+REQUERIMENTS
+
+  libxml2 (http://xmlsoft.org)
+  libcurl (http://curl.haxx.se)
+
+
+BUILD AND INSTALL
+
+  $ make clean
+  $ make
+  $ sudo make install
+  or
+  $ sudo make install DESTDIR=/path/to/dir
+
+
+USAGE
+
+  Usage: portdbc <command> <arg>
+  Where commands are:
+    repos             Overview of available repositories
+    dups              List of duplicated ports
+    search <STRING>   Search for ports by name
+    list <REPO>       Ports in repository REPO
+    getup <REPO>      Print httpup/rsync file for REPO
+    help              Show this help information
+
+
+IDEAS, PATCHES, BUGS AND REPORTS
+
+  Please contact to me: Jose V Beneyto, <sepen@crux.nu>
