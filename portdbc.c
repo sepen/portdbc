@@ -12,6 +12,8 @@
 #define CMD_LIST   4
 #define CMD_GETUP  5 // not used atm.
 
+#define VERSION_STRING "portdbc 1.0 by Jose V Beneyto, <sepen@crux.nu>"
+
 size_t writeCallback(void *ptr, size_t size, size_t nmemb, void *stream)
 {
   int written = fwrite(ptr, size, nmemb, (FILE *)stream);
@@ -203,6 +205,7 @@ void listPorts(xmlNode *r_node)
 
 void printUsage()
 {
+  printf("%s\n", VERSION_STRING);
   printf("Usage: portdbc <command> <arg>\n");
   printf("Where commands are:\n");
   printf("  repos            Overview of available repositories\n");
@@ -287,7 +290,7 @@ int main(int argc, char** argv)
       if (!r_node || !r_node->name || xmlStrcmp(r_node->name, (const xmlChar *) "repos"))
       {
         xmlFreeDoc(doc);
-        printf("Error, temporary file not compatible\n");
+        fprintf(stdout, "Error, temporary file not compatible\n");
         return -1;
       }
       // print all repositories
