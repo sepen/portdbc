@@ -6,6 +6,12 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
+#define CMD_REPOS  1
+#define CMD_DUPS   2
+#define CMD_SEARCH 3
+#define CMD_LIST   4
+#define CMD_GETUP  5 // not used atm.
+
 size_t writeCallback(void *ptr, size_t size, size_t nmemb, void *stream)
 {
   int written = fwrite(ptr, size, nmemb, (FILE *)stream);
@@ -95,25 +101,28 @@ void listRepos(xmlNode *r_node)
       // interate all child nodes of "repo"
       for (child_node = cur_node->children; child_node != NULL; child_node = child_node->next)
       {
-        if (child_node->type == XML_ELEMENT_NODE && xmlStrcmp(child_node->name, (const xmlChar *) "name") == 0)
+        if (child_node->type == XML_ELEMENT_NODE )
         {
-          asprintf(&name, "%s", (char *) child_node->children->content);
-        }
-        else if (child_node->type == XML_ELEMENT_NODE && xmlStrcmp(child_node->name, (const xmlChar *) "ports") == 0)
-        {
-          asprintf(&ports, "%s", (char *) child_node->children->content);
-        }
-        else if (child_node->type == XML_ELEMENT_NODE && xmlStrcmp(child_node->name, (const xmlChar *) "type") == 0)
-        {
-          asprintf(&type, "%s", (char *) child_node->children->content);
-        }
-        else if (child_node->type == XML_ELEMENT_NODE && xmlStrcmp(child_node->name, (const xmlChar *) "maintainer") == 0)
-        {
-          asprintf(&maintainer, "%s", (char *) child_node->children->content);
-        }
-        else if (child_node->type == XML_ELEMENT_NODE && xmlStrcmp(child_node->name, (const xmlChar *) "url") == 0)
-        {
-          asprintf(&url, "%s", (char *) child_node->children->content);
+          if (xmlStrcmp(child_node->name, (const xmlChar *) "name") == 0)
+          {
+            name = strdup((char *) child_node->children->content);
+          }
+          else if (xmlStrcmp(child_node->name, (const xmlChar *) "ports") == 0)
+          {
+            ports = strdup((char *) child_node->children->content);
+          }
+          else if (xmlStrcmp(child_node->name, (const xmlChar *) "type") == 0)
+          {
+            type = strdup((char *) child_node->children->content);
+          }
+          else if (xmlStrcmp(child_node->name, (const xmlChar *) "maintainer") == 0)
+          {
+            maintainer = strdup((char *) child_node->children->content);
+          }
+          else if (xmlStrcmp(child_node->name, (const xmlChar *) "url") == 0)
+          {
+            url = strdup((char *) child_node->children->content);
+          }
         }
       }
       // print repo line
@@ -137,13 +146,16 @@ void listDups(xmlNode *r_node)
       // iterate all child nodes of "duplicate"
       for (child_node = cur_node->children; child_node != NULL; child_node = child_node->next)
       {
-        if (child_node->type == XML_ELEMENT_NODE && xmlStrcmp(child_node->name, (const xmlChar *) "name") == 0)
+        if (child_node->type == XML_ELEMENT_NODE)
         {
-          asprintf(&name, "%s", (char *) child_node->children->content);
-        }
-        else if (child_node->type == XML_ELEMENT_NODE && xmlStrcmp(child_node->name, (const xmlChar *) "count") == 0)
-        {
-          asprintf(&count, "%s", (char *) child_node->children->content);
+          if (xmlStrcmp(child_node->name, (const xmlChar *) "name") == 0)
+          {
+            name = strdup((char *) child_node->children->content);
+          }
+          else if (xmlStrcmp(child_node->name, (const xmlChar *) "count") == 0)
+          {
+            count = strdup((char *) child_node->children->content);
+          }
         }
       }
       // print dup line
@@ -167,17 +179,20 @@ void listPorts(xmlNode *r_node)
       // iterate all child nodes of "port"
       for (child_node = cur_node->children; child_node != NULL; child_node = child_node->next)
       {
-        if (child_node->type == XML_ELEMENT_NODE && xmlStrcmp(child_node->name, (const xmlChar *) "name") == 0)
+        if (child_node->type == XML_ELEMENT_NODE)
         {
-          asprintf(&name, "%s", (char *) child_node->children->content);
-        }
-        else if (child_node->type == XML_ELEMENT_NODE && xmlStrcmp(child_node->name, (const xmlChar *) "repo") == 0)
-        {
-          asprintf(&repo, "%s", (char *) child_node->children->content);
-        }
-        else if (child_node->type == XML_ELEMENT_NODE && xmlStrcmp(child_node->name, (const xmlChar *) "command") == 0)
-        {
-          asprintf(&command, "%s", (char *) child_node->children->content);
+          if (xmlStrcmp(child_node->name, (const xmlChar *) "name") == 0)
+          {
+            name = strdup((char *) child_node->children->content);
+          }
+          else if (xmlStrcmp(child_node->name, (const xmlChar *) "repo") == 0)
+          {
+            repo = strdup((char *) child_node->children->content);
+          }
+          else if (xmlStrcmp(child_node->name, (const xmlChar *) "command") == 0)
+          {
+            command = strdup((char *) child_node->children->content);
+          }
         }
       }
       // print port line
@@ -200,41 +215,43 @@ void printUsage()
 
 int main(int argc, char** argv)
 {
+
   xmlDoc *doc = NULL;
   xmlNode *r_node = NULL;
 
-  char *url = NULL;
+  char *url = "http://crux.nu/portdb/";
   char *filename = "/tmp/portdb.xml";
 
-  int repos, dups, search, list, getup = 0;
+  int command = 0;
 
   if (argc > 1)
   {
     if (strcmp("repos", argv[1]) == 0)
     {
-      asprintf(&url, "http://crux.nu/portdb/?f=xml");
-      repos = 1; dups = 0; search = 0; list = 0; getup = 0;
+      asprintf(&url, "%s?f=xml", url);
+      command = CMD_REPOS;
     }
     else if (strcmp("dups", argv[1]) == 0)
     {
-      asprintf(&url, "http://crux.nu/portdb/?f=xml&a=dups");
-      repos = 0; dups = 1; search = 0; list = 0; getup = 0;
+      asprintf(&url, "%s?f=xml&a=dups", url);
+      command = CMD_DUPS;
     }
     else if (strcmp("search", argv[1]) == 0 && argc > 2)
     {
-      asprintf(&url, "http://crux.nu/portdb/?f=xml&a=search&q=%s", argv[2]);
-      repos = 0; dups = 0; search = 1; list = 0; getup = 0;
+      asprintf(&url, "%s?f=xml&a=search&q=%s", url, argv[2]);
+      command = CMD_SEARCH;
     }
     else if (strcmp("list", argv[1]) == 0 && argc > 2)
     {
-      asprintf(&url, "http://crux.nu/portdb/?f=xml&a=repo&q=%s", argv[2]);
-      repos = 0; dups = 0; search = 0; list = 1; getup = 0;
+      asprintf(&url, "%s?f=xml&a=repo&q=%s", url, argv[2]);
+      command = CMD_LIST;
     }
     else if (strcmp("getup", argv[1]) == 0 && argc > 2)
     {
-      asprintf(&url, "http://crux.nu/portdb/?a=getup&q=%s", argv[2]);
-      repos = 0; dups = 0; search = 0; list = 0; getup = 1;
+      asprintf(&url, "%s?a=getup&q=%s", url, argv[2]);
+      // we should print the output since the output is not xml
       printHttpFile(url);
+      // and exit
       return 0;
     }
     else
@@ -256,40 +273,38 @@ int main(int argc, char** argv)
 
   if (doc == NULL)
   {
-    printf("error: could not parse file %s\n", filename);
+    fprintf(stderr, "Error, could not parse file %s\n", filename);
     return -1;
   }
 
   // get the root element node
   r_node = xmlDocGetRootElement(doc);
 
-  if (repos == 1)
+  switch (command)
   {
-    // validate as portdb xml compatible
-    if (!r_node || !r_node->name || xmlStrcmp(r_node->name, (const xmlChar *) "repos"))
-    {
-      printf("name: %s\n", r_node->name);
-      xmlFreeDoc(doc);
-      printf("error: temporary file not compatible\n");
-      return -1;
-    }
-    // print all repositories
-    listRepos(r_node);
-  }
-  else if (dups == 1)
-  {
-    listDups(r_node);
-  }
-  else if (search == 1)
-  {
-    listPorts(r_node);
-  }
-  else if (list == 1)
-  {
-    listPorts(r_node);
+    case CMD_REPOS:
+      // validate as portdb xml compatible
+      if (!r_node || !r_node->name || xmlStrcmp(r_node->name, (const xmlChar *) "repos"))
+      {
+        xmlFreeDoc(doc);
+        printf("Error, temporary file not compatible\n");
+        return -1;
+      }
+      // print all repositories
+      listRepos(r_node);
+      break;
+
+    case CMD_DUPS:
+      listDups(r_node);
+      break;
+
+    case CMD_SEARCH:
+    case CMD_LIST:
+      listPorts(r_node);
+      break;
   }
 
-  // free the document
+  // free
   xmlFreeDoc(doc);
 
   // free global variables allocated by the parser
