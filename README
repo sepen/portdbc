@@ -1,7 +1,15 @@
 
-========================================================================
- - portdbc - CRUX's portdb command line client
-========================================================================
+
+              portdbc: portdb command line client
+
+
+DESCRIPTION
+  portdbc is a command line tool which provides an easy way to query the
+  CRUX's portdb without the need of use a web browser for that.
+  One of the advantages of this tool is that it can be combinated with shell
+  functions, I/O operations, command filters, etc. to exactly find what you
+  are looking for.
+
 
 REQUERIMENTS
 
@@ -30,6 +38,21 @@ USAGE
     help              Show this help information
 
 
-IDEAS, PATCHES, BUGS AND REPORTS
+EXAMPLES
+
+  If you want to obtain the sync file from the kde4 repository:
+  # portdbc getup kde4 > /etc/ports/kde4.rsync
+
+  To find xfce ports out of the xfce repository:
+  # portdbc search xfce | grep -v ' xfce '
+
+  To obtain candidates for appending a port to your mpup's stuff:
+  # portdbc search audacity
+  Then you could append the command line of your prefered one:
+  # portdbc search audacity \
+  | grep ' prologic ' | awk '{print $3,$4,$5,$6}' >> /etc/mpup.lst
+
+
+BUGS AND REPORTS
 
   Please contact to me: Jose V Beneyto, <sepen@crux.nu>
