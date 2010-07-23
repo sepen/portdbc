@@ -6,6 +6,11 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
+// macro to avoid NULL pointers
+#define NONULL(x) ( x == NULL ? "" : x )
+// macro to free and initialize to NULL
+#define FREENULL(x) if (x) { free(x); x = NULL; }
+
 #define CMD_REPOS  1
 #define CMD_DUPS   2
 #define CMD_SEARCH 3
@@ -93,7 +98,11 @@ void listRepos(xmlNode *r_node)
   xmlNode *cur_node = NULL;
   xmlNode *child_node = NULL;
 
-  char *name, *ports, *type, *maintainer, *url = NULL;
+  char *name = NULL;
+  char *ports = NULL;
+  char *type = NULL;
+  char *maintainer = NULL;
+  char *url = NULL;
 
   // iterate all "repo" nodes
   for (cur_node = r_node->children; cur_node != NULL; cur_node = cur_node->next)
@@ -128,7 +137,13 @@ void listRepos(xmlNode *r_node)
         }
       }
       // print repo line
-      printf("%-14s %-4s %-7s %-40s %s\n", name, ports, type, maintainer, url);
+      printf("%-14s %-4s %-7s %-40s %s\n", NONULL(name), NONULL(ports), NONULL(type), NONULL(maintainer), NONULL(url));
+      // and free memory
+      FREENULL(name)
+      FREENULL(ports)
+      FREENULL(type)
+      FREENULL(maintainer)
+      FREENULL(url)
     }
   }
 }
@@ -138,7 +153,8 @@ void listDups(xmlNode *r_node)
   xmlNode *cur_node = NULL;
   xmlNode *child_node = NULL;
 
-  char *name, *count = NULL;
+  char *name = NULL;
+  char *count = NULL;
 
   // iterate all "duplicate" nodes
   for (cur_node = r_node->children; cur_node != NULL; cur_node = cur_node->next)
@@ -161,7 +177,10 @@ void listDups(xmlNode *r_node)
         }
       }
       // print dup line
-      printf("%-28s %s\n", name, count);
+      printf("%-28s %s\n", NONULL(name), NONULL(count));
+      // and free memory
+      FREENULL(name)
+      FREENULL(count)
     }
   }
 }
@@ -171,7 +190,9 @@ void listPorts(xmlNode *r_node)
   xmlNode *cur_node = NULL;
   xmlNode *child_node = NULL;
 
-  char *name, *repo, *command = NULL;
+  char *name = NULL;
+  char *repo = NULL;
+  char *command = NULL;
 
   // iterate all "port" nodes
   for (cur_node = r_node->children; cur_node != NULL; cur_node = cur_node->next)
@@ -198,7 +219,11 @@ void listPorts(xmlNode *r_node)
         }
       }
       // print port line
-      printf("%-28s %-14s %s\n", name, repo, command);
+      printf("%-28s %-14s %s\n", NONULL(name), NONULL(repo), NONULL(command));
+      // and free memory
+      FREENULL(name)
+      FREENULL(repo)
+      FREENULL(command)
     }
   }
 }
@@ -222,7 +247,8 @@ int main(int argc, char** argv)
   xmlDoc *doc = NULL;
   xmlNode *r_node = NULL;
 
-  char *url = "http://crux.nu/portdb/";
+  char *url = NULL;
+  char *portdb_url = "http://crux.nu/portdb/";
   char *filename = "/tmp/portdb.xml";
 
   int command = 0;
@@ -231,27 +257,27 @@ int main(int argc, char** argv)
   {
     if (strcmp("repos", argv[1]) == 0)
     {
-      asprintf(&url, "%s?f=xml", url);
+      asprintf(&url, "%s?f=xml", portdb_url);
       command = CMD_REPOS;
     }
     else if (strcmp("dups", argv[1]) == 0)
     {
-      asprintf(&url, "%s?f=xml&a=dups", url);
+      asprintf(&url, "%s?f=xml&a=dups", portdb_url);
       command = CMD_DUPS;
     }
     else if (strcmp("search", argv[1]) == 0 && argc > 2)
     {
-      asprintf(&url, "%s?f=xml&a=search&q=%s", url, argv[2]);
+      asprintf(&url, "%s?f=xml&a=search&q=%s", portdb_url, argv[2]);
       command = CMD_SEARCH;
     }
     else if (strcmp("list", argv[1]) == 0 && argc > 2)
     {
-      asprintf(&url, "%s?f=xml&a=repo&q=%s", url, argv[2]);
+      asprintf(&url, "%s?f=xml&a=repo&q=%s", portdb_url, argv[2]);
       command = CMD_LIST;
     }
     else if (strcmp("getup", argv[1]) == 0 && argc > 2)
     {
-      asprintf(&url, "%s?a=getup&q=%s", url, argv[2]);
+      asprintf(&url, "%s?a=getup&q=%s", portdb_url, argv[2]);
       // we should print the output since the output is not xml
       printHttpFile(url);
       // and exit
