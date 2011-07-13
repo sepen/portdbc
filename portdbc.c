@@ -11,13 +11,14 @@
 // macro to free and initialize to NULL
 #define FREENULL(x) if (x) { free(x); x = NULL; }
 
+#define NOCMD      0
 #define CMD_REPOS  1
 #define CMD_DUPS   2
 #define CMD_SEARCH 3
 #define CMD_LIST   4
 #define CMD_GETUP  5 // not used atm.
 
-#define VERSION_STRING "portdbc 1.0 by Jose V Beneyto, <sepen@crux.nu>"
+#define VERSION_STRING "portdbc 1.1 by Jose V Beneyto, <sepen@crux.nu>"
 
 size_t writeCallback(void *ptr, size_t size, size_t nmemb, void *stream)
 {
@@ -230,15 +231,20 @@ void listPorts(xmlNode *r_node)
 
 void printUsage()
 {
-  printf("%s\n", VERSION_STRING);
-  printf("Usage: portdbc <command> <arg>\n");
+  printf("Usage: portdbc <command> [arg]\n");
   printf("Where commands are:\n");
-  printf("  repos            Overview of available repositories\n");
-  printf("  dups             List of duplicated ports\n");
-  printf("  search <STRING>  Search for ports by name\n");
-  printf("  list <REPO>      Ports in repository REPO\n");
-  printf("  getup <REPO>     Print httpup/rsync file for REPO\n");
-  printf("  help             Show this help information\n");
+  printf("  repos             Overview of all available repositories\n");
+  printf("  dups              List of duplicated ports\n");
+  printf("  search  <expr>    Show port names containing 'expr'\n");
+  printf("  list    <repo>    Show ports in repository\n");
+  printf("  getup   <repo>    Print httpup/rsync file for a repository\n");
+  printf("  help              Show this help information\n");
+  printf("  version           Show version information\n");
+}
+
+void printVersion()
+{
+  printf("%s\n", VERSION_STRING);
 }
 
 int main(int argc, char** argv)
@@ -249,9 +255,18 @@ int main(int argc, char** argv)
 
   char *url = NULL;
   char *portdb_url = "http://crux.nu/portdb/";
-  char *filename = "/tmp/portdb.xml";
+  char *tmpfile = "/tmp/.portdbc.xml";
 
-  int command = 0;
+  // use HOME directory when available
+  char *home_dir = NULL;
+  home_dir = getenv("HOME");
+
+  if (home_dir != NULL)
+  {
+    asprintf(&tmpfile, "%s/.portdbc.xml", home_dir);
+  }
+
+  int command = NOCMD;
 
   if (argc > 1)
   {
@@ -278,9 +293,15 @@ int main(int argc, char** argv)
     else if (strcmp("getup", argv[1]) == 0 && argc > 2)
     {
       asprintf(&url, "%s?a=getup&q=%s", portdb_url, argv[2]);
-      // we should print the output since the output is not xml
+      command = CMD_GETUP;
+      // at this point we should print the output since it is not an xml
       printHttpFile(url);
       // and exit
+      return 0;
+    }
+    else if (strcmp("version", argv[1]) == 0)
+    {
+      printVersion();
       return 0;
     }
     else
@@ -295,14 +316,14 @@ int main(int argc, char** argv)
     return 0;
   }
 
-  saveHttpFile(url, filename);
+  saveHttpFile(url, tmpfile);
   free(url);
 
-  doc = xmlReadFile(filename, NULL, 0);
+  doc = xmlReadFile(tmpfile, NULL, 0);
 
   if (doc == NULL)
   {
-    fprintf(stderr, "Error, could not parse file %s\n", filename);
+    fprintf(stderr, "Error, could not parse file %s\n", tmpfile);
     return -1;
   }
 
@@ -316,7 +337,7 @@ int main(int argc, char** argv)
       if (!r_node || !r_node->name || xmlStrcmp(r_node->name, (const xmlChar *) "repos"))
       {
         xmlFreeDoc(doc);
-        fprintf(stdout, "Error, temporary file not compatible\n");
+        fprintf(stderr, "Error, temporary file not compatible\n");
         return -1;
       }
       // print all repositories
@@ -338,6 +359,9 @@ int main(int argc, char** argv)
 
   // free global variables allocated by the parser
   xmlCleanupParser();
+
+  // remove temporary file
+  remove(tmpfile);
 
   return 0;
 }
