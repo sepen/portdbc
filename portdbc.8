@@ -1,0 +1,58 @@
+.\" man page for portdbc
+.\" Jose V Beneyto, sepen@crux.nu
+.\" 
+.\" .PU
+.TH "portdbc" "8" "" "" ""
+
+
+.SH "NAME"
+.LP 
+portdbc \- Command line tool client for CRUX's portdb
+
+
+.SH "SYNOPSIS"
+.B portdbc <command> [arg]
+
+
+.SH "DESCRIPTION"
+portdbc is a command line tool which provides an easy way to query the CRUX's
+portdb (http://crux.nu/portdb) without the need of use a web browser for that.
+It is written in C and uses libcurl(3) for obtaining the desired information and
+after that parses them by using libxml(3) to show you the output result.
+One of the advantages of this tool is that it can be combinated with shell
+functions, I/O operations, command filters, etc. to exactly find what you are
+looking for.
+
+.SH "COMMANDS"
+
+.TP
+.B portdbc repos
+Overview of all available repositories
+
+.TP
+.B portdbc dups
+List of duplicated ports
+
+.TP
+.B portdbc search <word>
+Show port names containing
+.B word
+
+.TP
+.B portdbc list <repo>
+Show ports in repository
+
+.TP
+.B portdbc getup <repo>
+Print httpup/rsync file for a repository
+
+
+.SH "SEE ALSO"
+ports(8), libcurl(3), libxml(3)
+
+
+.SH "AUTHOR"
+.nf
+Jose V Beneyto <sepen@crux.nu>
+http://sepen.mine.nu/
+.fi
