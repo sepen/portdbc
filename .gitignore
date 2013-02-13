@@ -1,1 +1,5 @@
 portdbc
+Makefile
+configure
+config.*
+autom4te.*
