@@ -22,7 +22,8 @@ REQUERIMENTS
 
 BUILD AND INSTALL
 
-  $ make clean
+  $ autoconf
+  $ ./configure
   $ make
   $ sudo make install
   or

@@ -1,19 +1,21 @@
+DESTDIR =
+
+PREFIX = @prefix@
+DATAROOTDIR = @datarootdir@
+BINDIR = @bindir@
+MANDIR = @mandir@
+
 CURL_CONFIG = /usr/bin/curl-config
-CURL_LIBS   = $(shell $(CURL_CONFIG) --libs)
+CURL_LIBS = $(shell $(CURL_CONFIG) --libs)
 CURL_CFLAGS = $(shell $(CURL_CONFIG) --cflags)
 
 XML2_CONFIG = /usr/bin/xml2-config
-XML2_LIBS   = $(shell $(XML2_CONFIG) --libs)
+XML2_LIBS = $(shell $(XML2_CONFIG) --libs)
 XML2_CFLAGS = $(shell $(XML2_CONFIG) --cflags)
 
-DESTDIR =
+CC = @CC@
 
-BINDIR  = /usr/bin
-MANDIR  = /usr/man
-
-CC      = gcc
-
-LIBS   += -L/usr/lib $(CURL_LIBS) $(XML2_LIBS)
+LIBS += -L/usr/lib $(CURL_LIBS) $(XML2_LIBS)
 CFLAGS += -I/usr/include $(CURL_CFLAGS) $(XML2_CFLAGS)
 
 all: portdbc

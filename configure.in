@@ -1,0 +1,9 @@
+AC_INIT(portdbc, 1.1)
+
+AC_PROG_CC
+
+AC_CHECK_HEADERS(stdio.h string.h, [break])
+AC_CHECK_HEADERS(curl/curl.h, [break])
+AC_CHECK_HEADERS(libxml/parser.h libxml/tree.h, [break])
+
+AC_OUTPUT(Makefile)
