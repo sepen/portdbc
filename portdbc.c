@@ -256,6 +256,9 @@ int main(int argc, char** argv)
   char *url = NULL;
   char *portdb_url = "http://crux.nu/portdb/";
   char *tmpfile = "/tmp/.portdbc.xml";
+  char *configfile = "/tmp/.portdbc.conf";
+
+  FILE *file_handle = NULL;
 
   // use HOME directory when available
   char *home_dir = NULL;
@@ -264,6 +267,31 @@ int main(int argc, char** argv)
   if (home_dir != NULL)
   {
     asprintf(&tmpfile, "%s/.portdbc.xml", home_dir);
+    asprintf(&configfile, "%s/.portdbc.conf", home_dir);
+    // try to read config values
+    if ((file_handle = fopen(configfile, "r+")))
+    {
+      char line[256], option[256], value[256];
+      int linenum=0;
+      while(fgets(line, 256, file_handle) != NULL)
+      {
+        linenum++;
+        // ignore comments from config file
+        if(line[0] == '#') continue;
+        // try to read the pair 'option = value'
+        if(sscanf(line, "%s = %s", option, value) != 2)
+        {
+          //fprintf(stderr, "Invalid syntax, line %d\n", linenum);
+          continue;
+        }
+        //fprintf(stdout, "%-2d: %s = %s\n", linenum, option, value);
+        if(strcmp(option, "portdb_url") == 0)
+        {
+	  asprintf(&portdb_url, value);
+        }
+      }
+      //fprintf(stdout, "portdb_url: %s\n", portdb_url);
+    }
   }
 
   int command = NOCMD;
