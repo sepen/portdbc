@@ -1,3 +1,11 @@
+/*
+ * portdbc - CRUX's portdb command line client
+ *
+ * Copyright 2010-2012 Jose V Beneyto, <sepen@crux.nu>
+ *
+ * Licensed under GPLv2, see file COPYING in this source tree.
+ */
+
 #define _GNU_SOURCE
 
 #include <stdio.h>
