@@ -13,10 +13,13 @@ CFLAGS = @curl_CFLAGS@ @xml2_CFLAGS@
 all: portdbc
 
 portdbc: portdbc.c
-	$(CC) -Wall $(LIBS) $(CFLAGS) -o portdbc portdbc.c
+	$(CC) -Wall $(CFLAGS) -o portdbc portdbc.c $(LIBS)
 
 clean:
 	@rm -f portdbc
+
+distclean: clean
+	@rm -rf Makefile configure config.log config.status autom4te.*
 
 install: portdbc portdbc.8
 	@install -d $(DESTDIR)$(BINDIR)
