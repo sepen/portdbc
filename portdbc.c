@@ -1,7 +1,7 @@
 /*
  * portdbc - CRUX's portdb command line client
  *
- * Copyright 2010-2012 Jose V Beneyto, <sepen@crux.nu>
+ * Copyright 2010-2019 Jose V Beneyto, <sepen@crux.nu>
  *
  * Licensed under GPLv2, see file COPYING in this source tree.
  */
@@ -26,7 +26,7 @@
 #define CMD_LIST   4
 #define CMD_GETUP  5 // not used atm.
 
-#define VERSION_STRING "portdbc 1.1 by Jose V Beneyto, <sepen@crux.nu>"
+#define VERSION_STRING "portdbc 1.2 by Jose V Beneyto, <sepen@crux.nu>"
 
 size_t writeCallback(void *ptr, size_t size, size_t nmemb, void *stream)
 {
@@ -51,6 +51,9 @@ int printHttpFile(char *url)
 
     /* send all data to this function  */
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, writeCallback);
+
+    /* 302 http -> https  */
+    curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1L);
 
     /* get it! */
     curl_easy_perform(curl_handle);
@@ -262,7 +265,7 @@ int main(int argc, char** argv)
   xmlNode *r_node = NULL;
 
   char *url = NULL;
-  char *portdb_url = "http://crux.nu/portdb/";
+  char *portdb_url = "https://crux.nu/portdb/";
   char *tmpfile = "/tmp/.portdbc.xml";
   char *configfile = "/tmp/.portdbc.conf";
 
@@ -295,7 +298,7 @@ int main(int argc, char** argv)
         //fprintf(stdout, "%-2d: %s = %s\n", linenum, option, value);
         if(strcmp(option, "portdb_url") == 0)
         {
-	  asprintf(&portdb_url, value);
+          asprintf(&portdb_url, "%s", value);
         }
       }
       //fprintf(stdout, "portdb_url: %s\n", portdb_url);
