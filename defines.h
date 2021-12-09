@@ -1,4 +1,7 @@
-#include <stdio.h>
+#ifndef DEFINES_H
+#define DEFINES_H
+
+#define _GNU_SOURCE
 
 // macro to avoid NULL pointers
 #define NONULL(x) ( x == NULL ? "" : x )
@@ -14,8 +17,4 @@
 
 #define VERSION_STRING "portdbc 1.2 by Jose V Beneyto, <sepen@crux.nu>"
 
-size_t writeCallback(void *ptr, size_t size, size_t nmemb, void *stream)
-{
-  int written = fwrite(ptr, size, nmemb, (FILE *)stream);
-  return written;
-}
+#endif
