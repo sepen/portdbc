@@ -1,7 +1,7 @@
 /*
  * portdbc - CRUX's portdb command line client
  *
- * Copyright 2010-2019 Jose V Beneyto, <sepen@crux.nu>
+ * Copyright 2010-2024 Jose Beneyto
  *
  * Licensed under GPLv2, see file COPYING in this source tree.
  */

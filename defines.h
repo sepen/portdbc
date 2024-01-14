@@ -15,6 +15,6 @@
 #define CMD_LIST   4
 #define CMD_GETUP  5
 
-#define VERSION_STRING "portdbc 1.2 by Jose V Beneyto, <sepen@crux.nu>"
+#define VERSION_STRING "portdbc 1.3"
 
 #endif
