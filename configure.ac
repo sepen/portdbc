@@ -1,4 +1,4 @@
-AC_INIT(portdbc, 1.1)
+AC_INIT([portdbc],[1.1])
 
 AC_PROG_CC
 
@@ -35,4 +35,5 @@ AC_ARG_WITH([xml2-lib-path],
 AC_SUBST([xml2_LIBS])
 
 
-AC_OUTPUT(Makefile)
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
