@@ -96,7 +96,7 @@ void listRepos(xmlNode *r_node) {
                     }
                 }
             }
-            printf("%-14s %-4s %-7s %-40s %s\n",
+            printf("%-20s %-4s %-7s %-46s %s\n",
                    NONULL(name), NONULL(ports), NONULL(type),
                    NONULL(maintainer), NONULL(url));
 

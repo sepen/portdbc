@@ -15,6 +15,6 @@
 #define CMD_LIST   4
 #define CMD_GETUP  5
 
-#define VERSION_STRING "portdbc 1.3"
+#define VERSION_STRING "portdbc 1.4"
 
 #endif
